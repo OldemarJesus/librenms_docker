@@ -35,7 +35,7 @@ services:
     restart: always
 
   librenms:
-    image: librenms/librenms:latest
+    image: librenms:latest
     container_name: librenms
     hostname: librenms
     cap_add:
@@ -65,7 +65,7 @@ services:
     restart: always
 
   dispatcher:
-    image: librenms/librenms:latest
+    image: librenms:latest
     container_name: librenms_dispatcher
     hostname: librenms-dispatcher
     cap_add:
@@ -92,7 +92,7 @@ services:
     restart: always
 
   syslogng:
-    image: librenms/librenms:latest
+    image: librenms:latest
     container_name: librenms_syslogng
     hostname: librenms-syslogng
     cap_add:
@@ -124,8 +124,28 @@ services:
       - "SIDECAR_SYSLOGNG=1"
     restart: always
 
+  snmpd:
+    image: polinux/snmpd:alpine
+    container_name: librenms_snmpd
+    hostname: librenms-snmpd
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    depends_on:
+      - librenms
+      - redis
+    ports:
+      - target: 161
+        published: 161
+        protocol: tcp
+      - target: 161
+        published: 161
+        protocol: udp
+    volumes:
+      - "./snmpd/snmpd.conf:/etc/snmpd/snmpd.conf"
+
   snmptrapd:
-    image: librenms/librenms:latest
+    image: librenms:latest
     container_name: librenms_snmptrapd
     hostname: librenms-snmptrapd
     cap_add:
